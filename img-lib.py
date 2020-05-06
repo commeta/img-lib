@@ -2,7 +2,7 @@
 # Import modules for CGI handling
 # Ресайз, конвертер, вставка логотипа, водяные знаки
 #
-# apt install python3-pymysql
+# apt install python3-pymysql python-pil
 #
 # example: GET /cgi-bin/test.py?query=list_all_images
 #
@@ -13,6 +13,7 @@ import pymysql
 import json
 import os
 
+from PIL import Image
 from pathlib import Path
 from pymysql.cursors import DictCursor
 
@@ -32,8 +33,14 @@ def list_all_images():
 
         if image.is_dir():
             continue
+        
+        file_image = {}
+        with Image.open(str(image)) as img:
+            file_image['width'], file_image['height'] = img.size
+        
+        file_image['path'] = str(image)
 
-        files[count_files] = str(image)
+        files[count_files] = file_image
         count_files = count_files + 1
 
     request['directory'] = str(directory)
